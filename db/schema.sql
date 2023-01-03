@@ -24,3 +24,9 @@ manager_id INT NOT NULL,
 FOREIGN KEY (role_id) REFERENCES roles(id),
 FOREIGN KEY (manager_id) REFERENCES employee(id)
 );
+
+-- CREATE TABLE manager (
+--     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+--     manager_name VARCHAR(30),
+--     FOREIGN KEY (manager_name) REFERENCES employee(manager_id)
+-- );
