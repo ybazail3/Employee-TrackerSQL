@@ -81,10 +81,13 @@ const userChoice = () => {
                     "View All Employees",
                     "Add Employee",
                     "Update Employee Role",
+                    "Delete Employee",
                     "View All Roles",
                     "Add Role",
+                    "Delete Role",
                     "View All Departments",
                     "Add Department",
+                    "Delete Department",
                     "View Department Budget",
                 ],
             },
@@ -100,17 +103,26 @@ const userChoice = () => {
                 case "Update Employee Role":
                     updateEmployee();
                     break;
+                case "Delete Employee":
+                    deleteEmployee();
+                    break;
                 case "View All Roles":
                     viewRoles();
                     break;
                 case "Add Role":
                     addRole();
                     break;
+                case "Delete Role":
+                    deleteRole();
+                    break;
                 case "View All Departments":
                     viewDepartments();
                     break;
                 case "Add Department":
                     addDepartment();
+                    break;
+                case "Delete Department":
+                    deleteDepartment();
                     break;
                 case "View Department Budget":
                     departmentBudget();
@@ -123,7 +135,6 @@ const userChoice = () => {
 };
 
 const viewEmployees = () => {
-    console.log("calling function!");
     connection.query(
         `SELECT employee.id, employee.first_name, employee.last_name, roles.title, 
         department.department_name, roles.salary, employee.manager_id 
@@ -196,6 +207,23 @@ const updateEmployee = () => {
         });
 };
 
+const deleteEmployee = () => {
+    return inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Enter Employee",
+                name: "employee",
+            },
+        ]).then((answers) => {
+            connection.query(
+                `DELETE FROM employee WHERE id='${answers.employee}'`
+            ),
+                console.table(answers);
+            userChoice();
+        })
+};
+
 const viewRoles = () => {
     connection.query(
         `SELECT roles.id, roles.title, department.department_name, roles.salary FROM roles LEFT JOIN department ON roles.department_id = department.id`,
@@ -237,6 +265,23 @@ const addRole = () => {
         });
 };
 
+const deleteRole = () => {
+    return inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Enter Role ID",
+                name: "role",
+            },
+        ]).then((answers) => {
+            connection.query(
+                `DELETE FROM roles WHERE id='${answers.role}'`
+            ),
+                console.table(answers);
+            userChoice();
+        })
+};
+
 const viewDepartments = () => {
     connection.query(
         `SELECT id, department_name FROM department`,
@@ -268,6 +313,29 @@ const addDepartment = () => {
         });
 };
 
+const deleteDepartment = () => {
+    console.log('Calling delete department')
+    return inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Enter Department",
+                name: "department",
+            },
+        ]).then((answers) => {
+            connection.query(
+                `DELETE FROM department WHERE department_name='${answers.department}'`,
+                (err, results) => {
+                    if (err) {
+                        console.log(err);
+                    }
+
+                    console.table(answers, results);
+                    userChoice();
+                })
+        })
+};
+
 const departmentBudget = () => {
     return inquirer
         .prompt([
@@ -277,14 +345,19 @@ const departmentBudget = () => {
                 name: 'departmentID',
             },
         ]).then((answers) => {
-            budget();
             connection.query(
-                `SELECT SUM(salary) FROM roles WHERE department_id=${answers.departmentID}`
-            ),
-                console.table(answers);
-            userChoice();
+                `SELECT SUM(salary) FROM roles WHERE department_id=${answers.departmentID}`,
+                (err, results) => {
+                    if (err) {
+                        console.log(err);
+                    }
+
+                    console.table(answers, results);
+                    userChoice();
+                })
         })
 };
+
 
 const finishedUpdating = () => {
     console.log("Finished Updating!");
